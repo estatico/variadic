@@ -1,0 +1,65 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.34.2.
+--
+-- see: https://github.com/sol/hpack
+
+name:           variadic
+version:        0.0.0.0
+synopsis:       Abstractions for working with variadic functions
+description:    Please see the README on GitHub at <https://github.com/carymrobbins/variadic#readme>
+category:       Control
+homepage:       https://github.com/carymrobbins/variadic#readme
+bug-reports:    https://github.com/carymrobbins/variadic/issues
+author:         Cary Robbins
+maintainer:     carymrobbins@gmail.com
+copyright:      2020 Cary Robbins
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    CHANGELOG.md
+    testdata/TestCompilerErrors.hs
+    testdata/TestCompilerErrors.txt
+
+source-repository head
+  type: git
+  location: https://github.com/carymrobbins/variadic
+
+library
+  exposed-modules:
+      Control.Variadic
+      Control.Variadic.Generic
+      Control.Variadic.Generic.Internal
+      Control.Variadic.Varargs
+  other-modules:
+      Paths_variadic
+  hs-source-dirs:
+      src
+  ghc-options: -Wall
+  build-depends:
+      base >=4.7 && <5
+    , mmorph >=1.1.3 && <1.2
+    , mtl >=2.2.2 && <2.3
+  default-language: Haskell2010
+
+test-suite variadic-test
+  type: exitcode-stdio-1.0
+  main-is: Test.hs
+  other-modules:
+      Test.Infra.Handle
+      Test.ShouldNotCompile
+      Paths_variadic
+  hs-source-dirs:
+      test
+  ghc-options: -Wall -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , containers
+    , hspec
+    , hspec-expectations-lifted
+    , mmorph >=1.1.3 && <1.2
+    , mtl >=2.2.2 && <2.3
+    , process
+    , variadic
+  default-language: Haskell2010

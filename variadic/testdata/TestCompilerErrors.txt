@@ -1,0 +1,43 @@
+testdata/TestCompilerErrors.hs:24:13: error:
+    • Field:
+        b1 :: IO ()
+      cannot be ghoist-ed with the supplied function and was not in the ignored fields list: '["close"]
+    • In the expression: ghoist (flip runReaderT ()) readerHandle1
+      In an equation for ‘ioHandle1’:
+          ioHandle1 = ghoist (flip runReaderT ()) readerHandle1
+   |
+24 | ioHandle1 = ghoist (flip runReaderT ()) readerHandle1
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+testdata/TestCompilerErrors.hs:32:17: error:
+    • Constructor ‘Handle2’ does not have field ‘a1’
+    • In the expression: Handle2 {a1 = pure (), b2 = pure ()}
+      In an equation for ‘readerHandle2’:
+          readerHandle2 = Handle2 {a1 = pure (), b2 = pure ()}
+   |
+32 | readerHandle2 = Handle2
+   |                 ^^^^^^^...
+
+testdata/TestCompilerErrors.hs:38:13: error:
+    • Field:
+        b2 :: ReaderT () IO ()
+      must be ghoist-ed but was present in the ignored fields list: '["b2"]
+    • In the expression:
+        ghoist' (Proxy @'["b2"]) (flip runReaderT ()) readerHandle2
+      In an equation for ‘ioHandle2’:
+          ioHandle2
+            = ghoist' (Proxy @'["b2"]) (flip runReaderT ()) readerHandle2
+   |
+38 | ioHandle2 = ghoist' (Proxy @'["b2"]) (flip runReaderT ()) readerHandle2
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+testdata/TestCompilerErrors.hs:52:13: error:
+    • Field:
+        b3 :: IO ()
+      cannot be ghoist-ed with the supplied function and was not in the ignored fields list: '[]
+    • In the expression: ghoist0 (flip runReaderT ()) readerHandle3
+      In an equation for ‘ioHandle3’:
+          ioHandle3 = ghoist0 (flip runReaderT ()) readerHandle3
+   |
+52 | ioHandle3 = ghoist0 (flip runReaderT ()) readerHandle3
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
