@@ -1,5 +1,8 @@
 module Control.Variadic.Generic
-  ( ghoist
+  ( GHoist
+  , GHoist0
+  , GHoist'
+  , ghoist
   , ghoist0
   , ghoist'
   ) where

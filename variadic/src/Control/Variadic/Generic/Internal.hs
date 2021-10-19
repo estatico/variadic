@@ -17,13 +17,28 @@ import Data.Proxy (Proxy(Proxy))
 import GHC.Generics
 import GHC.TypeLits
 
+-- | Constraint useful when trying to use 'ghoist'' in a polymorphic
+-- context.
+--
+-- > data H f = H { foo :: String -> f Int, bar :: Int -> f String }
+-- >
+-- > hoistH :: (GHoist' H f g '[]) => (forall x. f x -> g x) -> H f -> H g
+-- > hoistH = ghoist0
+type GHoist' r f g = GGHoist (Rep (r f)) (Rep (r g)) f g
+
+-- | Same as 'GHoist'' but for 'ghoist'.
+type GHoist r f g = GHoist' r f g '["close"]
+
+-- | Same as 'GHoist'' but for 'ghoist0'.
+type GHoist0 r f g = GHoist' r f g '[]
+
 -- | Runs @hoist@ on the return values each field of @r@
 -- with the given natural transformation function, ignoring
 -- the @close@ field, if it exists.
 ghoist
   :: ( Generic (r f)
      , Generic (r g)
-     , GHoist (Rep (r f)) (Rep (r g)) f g '["close"]
+     , GHoist r f g
      )
   => (forall x. f x -> g x)
   -> r f
@@ -36,7 +51,7 @@ ghoist = ghoist' (Proxy @'["close"])
 ghoist0
   :: ( Generic (r f)
      , Generic (r g)
-     , GHoist (Rep (r f)) (Rep (r g)) f g '[]
+     , GHoist0 r f g
      )
   => (forall x. f x -> g x)
   -> r f
@@ -50,7 +65,7 @@ ghoist0 = ghoist' (Proxy @'[])
 ghoist'
   :: ( Generic (r f)
      , Generic (r g)
-     , GHoist (Rep (r f)) (Rep (r g)) f g ignored
+     , GHoist' r f g ignored
      )
   => proxy ignored
   -> (forall x. f x -> g x)
@@ -58,18 +73,18 @@ ghoist'
   -> r g
 ghoist' proxy f = to . gghoist proxy f . from
 
-class GHoist (i :: * -> *) (o :: * -> *) (f :: * -> *) (g :: * -> *) (ignored :: [Symbol]) where
+class GGHoist (i :: * -> *) (o :: * -> *) (f :: * -> *) (g :: * -> *) (ignored :: [Symbol]) where
   gghoist :: proxy ignored -> (forall x. f x -> g x) -> i p -> o p
 
-instance (GHoist i o f g ignored) => GHoist (M1 D c i) (M1 D c o) f g ignored where
+instance (GGHoist i o f g ignored) => GGHoist (M1 D c i) (M1 D c o) f g ignored where
   gghoist proxy f (M1 i) = M1 (gghoist proxy f i)
 
-instance (GHoist i o f g ignored) => GHoist (M1 C c i) (M1 C c o) f g ignored where
+instance (GGHoist i o f g ignored) => GGHoist (M1 C c i) (M1 C c o) f g ignored where
   gghoist proxy f (M1 i) = M1 (gghoist proxy f i)
 
 instance {-# OVERLAPPING #-}
   ( VerifyIgnored n a ignored
-  ) => GHoist
+  ) => GGHoist
         (M1 S ('MetaSel ('Just n) su ss ds) (K1 R a))
         (M1 S ('MetaSel ('Just n) su ss ds) (K1 R a))
         f g ignored
@@ -77,9 +92,9 @@ instance {-# OVERLAPPING #-}
   gghoist _proxy _f (M1 i) = M1 i
 
 instance
-  ( GHoist (K1 R i) (K1 R o) f g ignored
+  ( GGHoist (K1 R i) (K1 R o) f g ignored
   , VerifyNotIgnored n i ignored
-  ) => GHoist
+  ) => GGHoist
         (M1 S ('MetaSel ('Just n) su ss ds) (K1 R i))
         (M1 S ('MetaSel ('Just n) su ss ds) (K1 R o))
         f g ignored
@@ -87,9 +102,9 @@ instance
   gghoist proxy f (M1 i) = M1 (gghoist proxy f i)
 
 instance
-  ( GHoist i1 o1 f g ignored
-  , GHoist i2 o2 f g ignored
-  ) => GHoist (i1 :*: i2) (o1 :*: o2) f g ignored
+  ( GGHoist i1 o1 f g ignored
+  , GGHoist i2 o2 f g ignored
+  ) => GGHoist (i1 :*: i2) (o1 :*: o2) f g ignored
   where
   gghoist proxy f (i1 :*: i2) = gghoist proxy f i1 :*: gghoist proxy f i2
 
@@ -97,7 +112,7 @@ instance
   ( Monad f
   , IsVariadic vf args (f a)
   , IsVariadic vg args (g a)
-  ) => GHoist (K1 R vf) (K1 R vg) f g ignored
+  ) => GGHoist (K1 R vf) (K1 R vg) f g ignored
   where
   gghoist _proxy f (K1 vf) = K1 (vhoist f vf)
 
