@@ -12,7 +12,7 @@
 module Control.Variadic.Generic.Internal where
 
 import Control.Variadic
-import Data.Kind (Constraint)
+import Data.Kind (Constraint, Type)
 import Data.Proxy (Proxy(Proxy))
 import GHC.Generics
 import GHC.TypeLits
@@ -58,7 +58,7 @@ ghoist'
   -> r g
 ghoist' proxy f = to . gghoist proxy f . from
 
-class GHoist (i :: * -> *) (o :: * -> *) (f :: * -> *) (g :: * -> *) (ignored :: [Symbol]) where
+class GHoist (i :: Type -> Type) (o :: Type -> Type) (f :: Type -> Type) (g :: Type -> Type) (ignored :: [Symbol]) where
   gghoist :: proxy ignored -> (forall x. f x -> g x) -> i p -> o p
 
 instance (GHoist i o f g ignored) => GHoist (M1 D c i) (M1 D c o) f g ignored where

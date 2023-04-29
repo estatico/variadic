@@ -19,17 +19,18 @@
 module Control.Variadic.Bench.NoReader where
 
 import Data.Coerce (Coercible, coerce)
+import Data.Kind (Type)
 import Control.Monad.Morph (MFunctor(hoist), MMonad(embed), MonadTrans(lift))
 
-type family ToVariadicArgs x :: [*] where
+type family ToVariadicArgs x :: [Type] where
   ToVariadicArgs (a -> x) = a ': ToVariadicArgs x
   ToVariadicArgs a = '[]
 
-type family ToVariadicReturn x :: * where
+type family ToVariadicReturn x :: Type where
   ToVariadicReturn (a -> x) = ToVariadicReturn x
   ToVariadicReturn a = a
 
-type family Signature (args :: [*]) r where
+type family Signature (args :: [Type]) r where
   Signature '[] r = r
   Signature (x ': xs) r = x -> Signature xs r
 
@@ -57,11 +58,11 @@ toVariadicT
   => x -> VariadicT args f a
 toVariadicT = coerce
 
-newtype Variadic (args :: [*]) (a :: *) = Variadic
+newtype Variadic (args :: [Type]) (a :: Type) = Variadic
   { runVariadic :: Signature args a
   }
 
-newtype VariadicT (args :: [*]) (f :: * -> *) (a :: *) = VariadicT
+newtype VariadicT (args :: [Type]) (f :: Type -> Type) (a :: Type) = VariadicT
   { runVariadicT :: Signature args (f a)
   }
 
@@ -74,7 +75,8 @@ fromVariadic :: Variadic args a -> Signature args a
 fromVariadic = runVariadic
 
 instance (Functor f) => Functor (VariadicT '[] f) where
-  fmap f (VariadicT x) = VariadicT $ fmap f x {-# INLINE fmap #-}
+  fmap f (VariadicT x) = VariadicT $ fmap f x
+  {-# INLINE fmap #-}
 
 instance (Functor (VariadicT args f)) => Functor (VariadicT (arg ': args) f) where
   fmap f (VariadicT x) =
