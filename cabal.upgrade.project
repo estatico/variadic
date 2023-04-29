@@ -1,0 +1,2 @@
+import: variadic.config
+import: https://www.stackage.org/nightly-2023-04-29/cabal.config
