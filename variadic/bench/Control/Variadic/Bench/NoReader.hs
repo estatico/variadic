@@ -74,7 +74,8 @@ fromVariadic :: Variadic args a -> Signature args a
 fromVariadic = runVariadic
 
 instance (Functor f) => Functor (VariadicT '[] f) where
-  fmap f (VariadicT x) = VariadicT $ fmap f x {-# INLINE fmap #-}
+  fmap f (VariadicT x) = VariadicT $ fmap f x
+  {-# INLINE fmap #-}
 
 instance (Functor (VariadicT args f)) => Functor (VariadicT (arg ': args) f) where
   fmap f (VariadicT x) =
