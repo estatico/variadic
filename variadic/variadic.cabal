@@ -1,10 +1,10 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.31.2.
+-- This file has been generated from package.yaml by hpack version 0.35.1.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: d8b0b953a94896493afb01fb7d8f965e391cbb6caf5757a5293a10e8469a85e4
+-- hash: 57dccd61c2fb07f251fd03cfac67b1393e650d46833f51d01505d411e6788581
 
 name:           variadic
 version:        0.0.0.0
@@ -41,7 +41,7 @@ library
   ghc-options: -Wall
   build-depends:
       base >=4.7 && <5
-    , mmorph >=1.1.3 && <1.2
+    , mmorph >=1.1.3 && <1.3
     , mtl >=2.2.2 && <2.3
   default-language: Haskell2010
 
@@ -60,7 +60,7 @@ test-suite variadic-test
     , containers
     , hspec
     , hspec-expectations-lifted
-    , mmorph >=1.1.3 && <1.2
+    , mmorph >=1.1.3 && <1.3
     , mtl >=2.2.2 && <2.3
     , process
     , variadic
@@ -80,7 +80,7 @@ benchmark variadic-benchmark
   build-depends:
       base >=4.7 && <5
     , criterion
-    , mmorph >=1.1.3 && <1.2
+    , mmorph >=1.1.3 && <1.3
     , mtl >=2.2.2 && <2.3
     , variadic
   default-language: Haskell2010

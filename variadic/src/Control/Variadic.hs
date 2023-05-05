@@ -15,11 +15,12 @@ import Control.Monad.Morph (MFunctor(hoist), MMonad, MonadTrans)
 import Control.Monad.Reader (ReaderT(ReaderT))
 import Control.Variadic.Varargs (Varargs(Cons, Nil))
 import Data.Functor (void)
+import Data.Kind (Type)
 
 -- | Same as 'Variadic' but captures the higher-kinded type parameter in the
 -- return type. Useful so we can use 'Monad' and friends with 'Variadic'
 -- functions.
-newtype VariadicT args (m :: * -> *) a = VariadicT
+newtype VariadicT args (m :: Type -> Type) a = VariadicT
   { unVariadicT :: Variadic args (m a)
   } deriving (Functor, Applicative, Monad) via ReaderT (Varargs args) m
     deriving (MFunctor, MMonad, MonadTrans) via ReaderT (Varargs args)
@@ -47,12 +48,12 @@ newtype Variadic args a = Variadic
   }
 
 -- | Resolves the argument list for a function of arbitrary arity.
-type family ToVariadicArgs x :: [*] where
+type family ToVariadicArgs x :: [Type] where
   ToVariadicArgs (i -> o) = i ': ToVariadicArgs o
   ToVariadicArgs a = '[]
 
 -- | Resolves the return type for a function of arbitrary arity.
-type family ToVariadicReturn x :: * where
+type family ToVariadicReturn x :: Type where
   ToVariadicReturn (i -> o) = ToVariadicReturn o
   ToVariadicReturn a = a
 
@@ -78,7 +79,7 @@ instance {-# OVERLAPS #-}
       runVariadic (toVariadic (f arg)) args
 
 -- | Builds a function signature given the @args@ and return type @r@.
-type family FromVariadicSignature (args :: [*]) (r :: *) :: * where
+type family FromVariadicSignature (args :: [Type]) (r :: Type) :: Type where
   FromVariadicSignature '[] r = r
   FromVariadicSignature (arg ': args) r = arg -> FromVariadicSignature args r
 
